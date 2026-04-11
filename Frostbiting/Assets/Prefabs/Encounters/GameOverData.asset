@@ -15,8 +15,11 @@ MonoBehaviour:
   encounterName: 
   type: 3
   prefab: {fileID: 7410173757485646409, guid: 616c292404324ec4dbfbecb8a1d8d836, type: 3}
-  spawnCount: 5
+  spawnCount: 3
   minDistance: 2
   spawnNearOther: 0
   targetType: 0
+  useRingSpawn: 0
   nearRadius: 5
+  minRadius: 2
+  maxRadius: 6

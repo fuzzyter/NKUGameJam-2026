@@ -7,12 +7,29 @@ public class EncounterManager : MonoBehaviour
 
     public List<EncounterData> encounterDatas;
 
-    private List<Vector2> spawnedPositions = new List<Vector2>();
-    private List<EncounterObject> allEncounters = new List<EncounterObject>();
+    private readonly List<Vector2> spawnedPositions = new List<Vector2>();
+    private readonly List<EncounterObject> allEncounters = new List<EncounterObject>();
+
+    public IReadOnlyList<EncounterObject> GetEncounters() => allEncounters;
 
     void Start()
     {
         SpawnAll();
+    }
+
+    public Vector2 GetSuggestedPlayerSpawn(float minDistToEncounter)
+    {
+        if (!mapBounds)
+            return Vector2.zero;
+
+        for (int i = 0; i < 80; i++)
+        {
+            Vector2 p = GetRandomPosition();
+            if (IsFarEnough(p, minDistToEncounter))
+                return p;
+        }
+
+        return mapBounds.bounds.center;
     }
 
     void SpawnAll()
@@ -23,7 +40,8 @@ public class EncounterManager : MonoBehaviour
         SpawnAroundType(EncounterType.Good);
         SpawnAroundType(EncounterType.Bad);
     }
-        void SpawnByType(EncounterType type)
+
+    void SpawnByType(EncounterType type)
     {
         foreach (var data in encounterDatas)
         {
@@ -34,6 +52,7 @@ public class EncounterManager : MonoBehaviour
                     Vector2 pos = GetValidPosition(data);
 
                     GameObject obj = Instantiate(data.prefab, pos, Quaternion.identity);
+                    obj.transform.SetParent(transform, true);
 
                     var encounter = obj.GetComponent<EncounterObject>();
                     encounter.data = data;
@@ -50,9 +69,7 @@ public class EncounterManager : MonoBehaviour
         foreach (var data in encounterDatas)
         {
             if (data.type == type)
-            {
                 SpawnAroundAnchors(data);
-            }
         }
     }
 
@@ -73,18 +90,18 @@ public class EncounterManager : MonoBehaviour
             if (Vector2.Distance(pos, p) < minDist)
                 return false;
         }
+
         return true;
     }
-        Vector2 GetNearPosition(EncounterData data)
+
+    Vector2 GetNearPosition(EncounterData data)
     {
         List<Vector2> candidates = new List<Vector2>();
 
         foreach (var e in allEncounters)
         {
             if (e.data.type == data.targetType)
-            {
                 candidates.Add(e.transform.position);
-            }
         }
 
         if (candidates.Count == 0)
@@ -128,6 +145,7 @@ public class EncounterManager : MonoBehaviour
 
         return GetRandomPosition();
     }
+
     void SpawnAroundAnchors(EncounterData data)
     {
         List<Vector2> anchors = new List<Vector2>();
@@ -135,9 +153,7 @@ public class EncounterManager : MonoBehaviour
         foreach (var e in allEncounters)
         {
             if (e.data.type == data.targetType)
-            {
                 anchors.Add(e.transform.position);
-            }
         }
 
         if (anchors.Count == 0) return;
@@ -162,6 +178,7 @@ public class EncounterManager : MonoBehaviour
             }
 
             GameObject obj = Instantiate(data.prefab, pos, Quaternion.identity);
+            obj.transform.SetParent(transform, true);
 
             var encounter = obj.GetComponent<EncounterObject>();
             encounter.data = data;

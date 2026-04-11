@@ -15,11 +15,11 @@ MonoBehaviour:
   encounterName: 
   type: 2
   prefab: {fileID: 6551194100137780967, guid: 4902e7a802b71074dac2cf4c939bf1f5, type: 3}
-  spawnCount: 10
+  spawnCount: 15
   minDistance: 1
   spawnNearOther: 1
   targetType: 3
   useRingSpawn: 1
   nearRadius: 5
-  minRadius: 1
-  maxRadius: 3
+  minRadius: 5
+  maxRadius: 15
