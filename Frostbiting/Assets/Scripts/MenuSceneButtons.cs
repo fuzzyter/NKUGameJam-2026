@@ -16,6 +16,7 @@ public class MenuSceneButtons : MonoBehaviour
 
     public void LoadMapScene()
     {
+        GameAudioManager.I?.PlayUiClick();
         if (string.IsNullOrWhiteSpace(mapSceneName))
         {
             Debug.LogWarning("MenuSceneButtons: mapSceneName is empty.");
@@ -27,6 +28,7 @@ public class MenuSceneButtons : MonoBehaviour
 
     public void QuitGame()
     {
+        GameAudioManager.I?.PlayUiClick();
 #if UNITY_EDITOR
         EditorApplication.isPlaying = false;
 #else

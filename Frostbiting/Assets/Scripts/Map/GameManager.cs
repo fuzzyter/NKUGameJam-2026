@@ -114,6 +114,8 @@ public class GameManager : MonoBehaviour
         if (addedCells == null || addedCells.Count == 0 || encounterManager == null || territoryGrid == null)
             return;
 
+        GameAudioManager.I?.PlayAreaCaptureComplete();
+
         HashSet<Vector2Int> set = new HashSet<Vector2Int>(addedCells);
         foreach (EncounterObject e in encounterManager.GetEncounters())
         {
@@ -149,6 +151,8 @@ public class GameManager : MonoBehaviour
                 hunterCount++;
                 break;
         }
+
+        GameAudioManager.I?.PlayPickup(e.data.type);
 
         if (stamina <= 0f)
             EndRun(false);
