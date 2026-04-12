@@ -9507,6 +9507,61 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 127198965}
   m_CullTransparentMesh: 1
+--- !u!1 &341041314
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 341041316}
+  - component: {fileID: 341041315}
+  m_Layer: 0
+  m_Name: MapDecoration
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &341041315
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 341041314}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 629b1812ca45cfd4ea1fbb9f4331ec7e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MapTreeScatter
+  mapBounds: {fileID: 72529424}
+  treeSprites:
+  - {fileID: 154215582481576558, guid: dda8554c3c2343447b91e93423689069, type: 3}
+  - {fileID: 6516332240493948503, guid: cc1fa8898103af84a95cfd72f2240031, type: 3}
+  - {fileID: -7689269965334199295, guid: a5651f4f49e5ff14c9605d3370ab9575, type: 3}
+  treeCount: 50
+  minSpacing: 1.5
+  sortingOrder: 15
+  container: {fileID: 0}
+  scaleRange: {x: 0.85, y: 1.15}
+  randomFlipX: 1
+--- !u!4 &341041316
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 341041314}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 5.73533, y: 3.21203, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &363264146
 GameObject:
   m_ObjectHideFlags: 0
@@ -9716,7 +9771,7 @@ MonoBehaviour:
   areaUi: {fileID: 0}
   mapBounds: {fileID: 72529424}
   trailLine: {fileID: 0}
-  moveSpeed: 8
+  moveSpeed: 5
   staminaCostPerWorldUnit: 0.5
   minTrailCells: 8
 --- !u!120 &481346623
@@ -10385,6 +10440,11 @@ MonoBehaviour:
   startOwnedHalfW: 3
   startOwnedHalfH: 3
   playerSpawnMinEncounterDist: 2
+  orderInLayerTerritory: 10
+  orderInLayerEncounter: 20
+  orderInLayerPlayerSprite: 30
+  orderInLayerPlayerTrail: 35
+  orderInLayerCompanion: 40
   staminaMax: 100
   stamina: 100
   treasureCount: 0
@@ -11957,3 +12017,4 @@ SceneRoots:
   - {fileID: 1013079426}
   - {fileID: 2129123555}
   - {fileID: 1188945220}
+  - {fileID: 341041316}
