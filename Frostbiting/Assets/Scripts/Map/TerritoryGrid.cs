@@ -42,11 +42,11 @@ public class TerritoryGrid : MonoBehaviour
             return;
 
         var go = new GameObject("TerritoryFill");
-        // 부모에 scale 이 크게 걸려 있으면(예: MapBound) 스프라이트 월드 크기가 같이 줄어듦 → 루트에 둠
         go.transform.SetParent(null, false);
         var sr = go.AddComponent<SpriteRenderer>();
         sr.color = Color.white;
-        sr.sortingOrder = 1;
+        if (GameManager.Instance != null)
+            sr.sortingOrder = GameManager.Instance.orderInLayerTerritory;
         go.AddComponent<TerritoryGridVisual>();
     }
 
@@ -59,6 +59,8 @@ public class TerritoryGrid : MonoBehaviour
         Vector2 local = world - _worldMin;
         int x = Mathf.FloorToInt(local.x / cellWorldSize);
         int y = Mathf.FloorToInt(local.y / cellWorldSize);
+        x = Mathf.Clamp(x, 0, _w - 1);
+        y = Mathf.Clamp(y, 0, _h - 1);
         return new Vector2Int(x, y);
     }
 

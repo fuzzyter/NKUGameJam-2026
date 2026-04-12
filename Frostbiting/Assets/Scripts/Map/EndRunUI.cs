@@ -15,12 +15,6 @@ public class EndRunUI : MonoBehaviour
             titleText.text = win ? "Victory" : "Game Over";
 
         if (timeText)
-        {
-            int totalSec = Mathf.FloorToInt(t);
-            int m = totalSec / 60;
-            int s = totalSec % 60;
-            int frac = Mathf.FloorToInt((t - totalSec) * 100f);
-            timeText.text = $"{m:00}:{s:00}.{frac:00}";
-        }
+            timeText.text = RunTimeFormat.AsMinutesSeconds(t);
     }
 }

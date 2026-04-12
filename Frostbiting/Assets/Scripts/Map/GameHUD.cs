@@ -1,4 +1,5 @@
 
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -6,14 +7,24 @@ public class GameHUD : MonoBehaviour
 {
     public GameManager gameManager;
     public Slider staminaSlider;
-    public Text dangerCountText;
+
+    [Tooltip("Camera viewport inside Treasure + Hunter count (no distinction)")]
+    public TextMeshProUGUI viewportTreasureHunterCountTMP;
+
+    [Tooltip("run time (MM:SS)")]
+    public TextMeshProUGUI runTimeText;
+
     public Camera worldCamera;
+    public Image[] hunterHearts;
 
     void Update()
     {
         if (!gameManager)
             gameManager = GameManager.Instance;
         if (!gameManager) return;
+
+        if (runTimeText)
+            runTimeText.text = RunTimeFormat.AsMinutesSeconds(gameManager.RunElapsedSeconds);
 
         if (staminaSlider)
         {
@@ -22,21 +33,32 @@ public class GameHUD : MonoBehaviour
         }
 
         Camera cam = worldCamera ? worldCamera : Camera.main;
-        if (!dangerCountText || !cam || gameManager.encounterManager == null)
-            return;
-
-        int n = 0;
-        foreach (EncounterObject e in gameManager.encounterManager.GetEncounters())
+        if (viewportTreasureHunterCountTMP && cam && gameManager.encounterManager != null)
         {
-            if (e.Collected || e.data == null) continue;
-            if (e.data.type != EncounterType.Treasure && e.data.type != EncounterType.Hunter)
-                continue;
+            int n = 0;
+            foreach (EncounterObject e in gameManager.encounterManager.GetEncounters())
+            {
+                if (e.Collected || e.data == null) continue;
+                if (e.data.type != EncounterType.Treasure && e.data.type != EncounterType.Hunter)
+                    continue;
 
-            Vector3 v = cam.WorldToViewportPoint(e.transform.position);
-            if (v.z > 0f && v.x > 0f && v.x < 1f && v.y > 0f && v.y < 1f)
-                n++;
+                Vector3 v = cam.WorldToViewportPoint(e.transform.position);
+                if (v.z > 0f && v.x > 0f && v.x < 1f && v.y > 0f && v.y < 1f)
+                    n++;
+            }
+
+            viewportTreasureHunterCountTMP.text = n.ToString();
         }
 
-        dangerCountText.text = n.ToString();
+        if (hunterHearts == null || hunterHearts.Length == 0)
+            return;
+
+        int lost = Mathf.Clamp(gameManager.hunterCount, 0, gameManager.maxHunter);
+        int visible = Mathf.Clamp(gameManager.maxHunter - lost, 0, hunterHearts.Length);
+        for (int i = 0; i < hunterHearts.Length; i++)
+        {
+            if (!hunterHearts[i]) continue;
+            hunterHearts[i].enabled = i < visible;
+        }
     }
 }

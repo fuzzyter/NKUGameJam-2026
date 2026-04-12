@@ -19,6 +19,13 @@ public class GameManager : MonoBehaviour
     public int startOwnedHalfH = 3;
     public float playerSpawnMinEncounterDist = 2f;
 
+    [Header("2D Order in Layer")]
+    public int orderInLayerTerritory = 10;
+    public int orderInLayerEncounter = 20;
+    public int orderInLayerPlayerSprite = 30;
+    public int orderInLayerPlayerTrail = 35;
+    public int orderInLayerCompanion = 40;
+
     [Header("Stats")]
     public float staminaMax = 100f;
     public float stamina = 100f;
@@ -32,6 +39,10 @@ public class GameManager : MonoBehaviour
     public string loseSceneName = "EndLose";
 
     public bool RunEnded { get; private set; }
+
+    public float RunElapsedSeconds => RunEnded ? _frozenRunElapsed : Time.timeSinceLevelLoad;
+
+    float _frozenRunElapsed;
 
     void Awake()
     {
@@ -90,8 +101,9 @@ public class GameManager : MonoBehaviour
     public void ApplyAllEncounterVisibility()
     {
         if (!encounterManager) return;
+        TerritoryGrid grid = territoryGrid ? territoryGrid : TerritoryGrid.Instance;
         foreach (EncounterObject e in encounterManager.GetEncounters())
-            e.RefreshVisibility(territoryGrid);
+            e.RefreshVisibility(grid);
     }
 
     public void ProcessCapture(IReadOnlyList<Vector2Int> addedCells)
@@ -151,6 +163,7 @@ public class GameManager : MonoBehaviour
         if (RunEnded) return;
         RunEnded = true;
         float t = Time.timeSinceLevelLoad;
+        _frozenRunElapsed = t;
         PlayerPrefs.SetFloat("LastRunTime", t);
         PlayerPrefs.SetInt("LastRunVictory", victory ? 1 : 0);
         PlayerPrefs.Save();
