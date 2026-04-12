@@ -11802,7 +11802,7 @@ MonoBehaviour:
   playerDot: {fileID: 1517229080}
   renderTextureSize: 512
   renderTextureDepth: 16
-  viewportOutlineColor: {r: 1, g: 1, b: 1, a: 0.35}
+  viewportOutlineColor: {r: 1, g: 0.26100624, b: 0.26100624, a: 0.35}
   viewportOutlineThickness: 2
 --- !u!1 &1679453016
 GameObject:
@@ -12620,6 +12620,11 @@ MonoBehaviour:
   minBeepInterval: 0.07
   maxBeepInterval: 0.8
   beepVolume: 0.55
+  spatialProximityBeeps: 1
+  spatialBeepMinDistance: 48
+  spatialSpread: 0
+  spatialStereoExaggeration: 2.13
+  spatialListenerOverride: {fileID: 0}
   behindDistance: 0.28
 --- !u!1 &2090774618
 GameObject:
