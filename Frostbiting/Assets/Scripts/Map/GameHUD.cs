@@ -11,6 +11,9 @@ public class GameHUD : MonoBehaviour
     [Tooltip("Camera viewport inside Treasure + Hunter count (no distinction)")]
     public TextMeshProUGUI viewportTreasureHunterCountTMP;
 
+    [Tooltip("run time (MM:SS)")]
+    public TextMeshProUGUI runTimeText;
+
     public Camera worldCamera;
     public Image[] hunterHearts;
 
@@ -19,6 +22,9 @@ public class GameHUD : MonoBehaviour
         if (!gameManager)
             gameManager = GameManager.Instance;
         if (!gameManager) return;
+
+        if (runTimeText)
+            runTimeText.text = RunTimeFormat.AsMinutesSeconds(gameManager.RunElapsedSeconds);
 
         if (staminaSlider)
         {

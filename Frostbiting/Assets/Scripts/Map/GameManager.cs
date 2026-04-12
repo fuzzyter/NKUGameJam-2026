@@ -40,6 +40,10 @@ public class GameManager : MonoBehaviour
 
     public bool RunEnded { get; private set; }
 
+    public float RunElapsedSeconds => RunEnded ? _frozenRunElapsed : Time.timeSinceLevelLoad;
+
+    float _frozenRunElapsed;
+
     void Awake()
     {
         Instance = this;
@@ -159,6 +163,7 @@ public class GameManager : MonoBehaviour
         if (RunEnded) return;
         RunEnded = true;
         float t = Time.timeSinceLevelLoad;
+        _frozenRunElapsed = t;
         PlayerPrefs.SetFloat("LastRunTime", t);
         PlayerPrefs.SetInt("LastRunVictory", victory ? 1 : 0);
         PlayerPrefs.Save();
