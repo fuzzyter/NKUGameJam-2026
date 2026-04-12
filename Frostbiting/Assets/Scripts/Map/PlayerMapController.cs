@@ -5,7 +5,6 @@ using UnityEngine.InputSystem;
 [RequireComponent(typeof(LineRenderer))]
 public class PlayerMapController : MonoBehaviour
 {
-
     public TerritoryGrid territory;
     public GameManager gameManager;
     public AreaConfirmUI areaUi;
@@ -18,11 +17,10 @@ public class PlayerMapController : MonoBehaviour
     [Header("Draw / stamina")]
     public float staminaCostPerWorldUnit = 0.35f;
     public int minTrailCells = 8;
-    public float warningRadius = 5f;
 
-    [Header("Optional")]
-    public AudioClip warningClip;
-    public AudioSource audioSource;
+    public Vector2 LastFacingDirection { get; private set; } = Vector2.down;
+    public bool IsDrawingOutsideOwned =>
+        _isDrawing && territory != null && !territory.IsOwnedWorld(transform.position);
 
     readonly List<Vector2Int> _trail = new List<Vector2Int>();
     Vector2Int _lastTrailCell = new Vector2Int(int.MinValue, int.MinValue);
@@ -32,7 +30,6 @@ public class PlayerMapController : MonoBehaviour
     bool _waitingChoice;
     Vector2Int _pendingSeed;
     readonly List<Vector2Int> _trailSnapshot = new List<Vector2Int>();
-    float _nextBeepTime;
 
     void Awake()
     {
@@ -45,8 +42,6 @@ public class PlayerMapController : MonoBehaviour
         trailLine.startColor = new Color(0.1f, 0.95f, 1f, 0.95f);
         trailLine.endColor = new Color(0.5f, 1f, 1f, 0.85f);
         AssignDefaultLineMaterial(trailLine);
-        if (!audioSource)
-            audioSource = GetComponent<AudioSource>();
     }
 
     static void AssignDefaultLineMaterial(LineRenderer lr)
@@ -114,7 +109,6 @@ public class PlayerMapController : MonoBehaviour
             Debug.Log("Yes[Y] or No[N] or Escape[Esc]");
             _wasInside = inside;
             UpdateTrailVisual();
-            UpdateProximityEffects(pos, false);
             return;
         }
 
@@ -147,7 +141,6 @@ public class PlayerMapController : MonoBehaviour
         }
 
         UpdateTrailVisual();
-        UpdateProximityEffects(pos, _isDrawing && !inside);
         _wasInside = inside;
     }
 
@@ -169,6 +162,9 @@ public class PlayerMapController : MonoBehaviour
         if (Input.GetKey(KeyCode.D)) input.x += 1f;
         if (input.sqrMagnitude > 1f)
             input.Normalize();
+
+        if (input.sqrMagnitude > 0.0001f)
+            LastFacingDirection = input.normalized;
 
         Vector2 p = transform.position;
         p += input * (moveSpeed * dt);
@@ -206,48 +202,6 @@ public class PlayerMapController : MonoBehaviour
         trailLine.SetPosition(n, transform.position);
     }
 
-    void UpdateProximityEffects(Vector2 playerWorld, bool active)
-    {
-        if (!gameManager || !gameManager.encounterManager)
-            return;
-
-        if (!active)
-        {
-            foreach (EncounterObject e in gameManager.encounterManager.GetEncounters())
-                e.ClearDrawingWarning();
-            return;
-        }
-
-        float minD = float.MaxValue;
-        foreach (EncounterObject e in gameManager.encounterManager.GetEncounters())
-        {
-            if (e.Collected) continue;
-            if (territory.IsOwnedWorld(e.transform.position))
-            {
-                e.ClearDrawingWarning();
-                continue;
-            }
-
-            float d = Vector2.Distance(playerWorld, e.transform.position);
-            if (d < minD) minD = d;
-
-            if (d < warningRadius)
-            {
-                float n = 1f - Mathf.Clamp01(d / warningRadius);
-                e.SetDrawingWarning(n);
-            }
-            else
-                e.ClearDrawingWarning();
-        }
-
-        if (minD < warningRadius && warningClip && audioSource && Time.time >= _nextBeepTime)
-        {
-            float urgency = 1f - Mathf.Clamp01(minD / warningRadius);
-            audioSource.PlayOneShot(warningClip, Mathf.Lerp(0.2f, 0.8f, urgency));
-            _nextBeepTime = Time.time + Mathf.Lerp(0.45f, 0.08f, urgency);
-        }
-    }
-
     void PendingYes()
     {
         if (!_waitingChoice) return;
@@ -260,8 +214,7 @@ public class PlayerMapController : MonoBehaviour
             if (territory.TryApplyCaptureWithFallback(_pendingSeed, _trailSnapshot, out List<Vector2Int> added))
                 gameManager.ProcessCapture(added);
             else
-                Debug.LogWarning(
-                    "failed to apply capture");
+                Debug.LogWarning("failed to apply capture");
         }
 
         _trail.Clear();
@@ -286,11 +239,10 @@ public class PlayerMapController : MonoBehaviour
     void AfterChoiceCleanup()
     {
         UpdateTrailVisual();
-        if (gameManager && gameManager.encounterManager)
-        {
-            foreach (EncounterObject e in gameManager.encounterManager.GetEncounters())
-                e.ClearDrawingWarning();
-        }
+        if (gameManager?.encounterManager == null) return;
+        TerritoryGrid g = gameManager.territoryGrid ?? TerritoryGrid.Instance;
+        foreach (EncounterObject e in gameManager.encounterManager.GetEncounters())
+            e.RefreshVisibility(g);
     }
 
     public void WarpTo(Vector2 world)
