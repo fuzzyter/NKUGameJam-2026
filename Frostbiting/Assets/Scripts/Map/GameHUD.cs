@@ -7,6 +7,9 @@ public class GameHUD : MonoBehaviour
     public GameManager gameManager;
     public Slider staminaSlider;
 
+    [Tooltip("e.g. 10/100 — current / max stamina. Leave empty to hide.")]
+    public TextMeshProUGUI staminaNumericText;
+
     [Tooltip("Camera viewport inside Treasure + Hunter count (no distinction)")]
     public TextMeshProUGUI viewportTreasureHunterCountTMP;
 
@@ -145,6 +148,13 @@ public class GameHUD : MonoBehaviour
         {
             staminaSlider.maxValue = gameManager.staminaMax;
             staminaSlider.value = gameManager.stamina;
+        }
+
+        if (staminaNumericText)
+        {
+            int cur = Mathf.RoundToInt(gameManager.stamina);
+            int max = Mathf.RoundToInt(gameManager.staminaMax);
+            staminaNumericText.text = $"{cur}/{max}";
         }
 
         Camera cam = worldCamera ? worldCamera : Camera.main;
