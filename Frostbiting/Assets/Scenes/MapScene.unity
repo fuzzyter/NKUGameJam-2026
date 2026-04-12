@@ -12503,6 +12503,8 @@ MonoBehaviour:
   staminaFloatDuration: 0.85
   staminaFloatStartYOffset: -36
   staminaFloatEndYOffset: 72
+  staminaFloatRadialSeparation: 30
+  staminaFloatRandomJitter: {x: 20, y: 20}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

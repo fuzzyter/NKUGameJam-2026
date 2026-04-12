@@ -28,6 +28,15 @@ public class GameHUD : MonoBehaviour
     public float staminaFloatStartYOffset = -36f;
     public float staminaFloatEndYOffset = 72f;
 
+    [Tooltip("distance between stamina pickup float")]
+    public float staminaFloatRadialSeparation = 22f;
+
+    [Tooltip("additional random offset")]
+    public Vector2 staminaFloatRandomJitter = new Vector2(16f, 12f);
+
+    const float GoldenAngleRad = 2.39996322972865332f;
+
+    int _staminaFloatSpawnId;
     GameManager _pickupEventSubscribedTo;
 
     void SubscribePickupDeltaIfNeeded()
@@ -80,8 +89,9 @@ public class GameHUD : MonoBehaviour
         rt.localScale = Vector3.one;
 
         Vector2 baseAnchored = templateRt.anchoredPosition;
-        Vector2 start = baseAnchored + new Vector2(0f, staminaFloatStartYOffset);
-        Vector2 end = baseAnchored + new Vector2(0f, staminaFloatEndYOffset);
+        Vector2 planeOffset = ComputeStaminaFloatPlaneOffset();
+        Vector2 start = baseAnchored + planeOffset + new Vector2(0f, staminaFloatStartYOffset);
+        Vector2 end = baseAnchored + planeOffset + new Vector2(0f, staminaFloatEndYOffset);
         rt.anchoredPosition = start;
 
         float dur = Mathf.Max(0.05f, staminaFloatDuration);
@@ -98,6 +108,24 @@ public class GameHUD : MonoBehaviour
         }
 
         Destroy(go);
+    }
+
+    Vector2 ComputeStaminaFloatPlaneOffset()
+    {
+        Vector2 radial = Vector2.zero;
+        if (staminaFloatRadialSeparation > 0.001f)
+        {
+            float angle = _staminaFloatSpawnId++ * GoldenAngleRad;
+            radial = new Vector2(Mathf.Cos(angle), Mathf.Sin(angle)) * staminaFloatRadialSeparation;
+        }
+
+        float jx = staminaFloatRandomJitter.x;
+        float jy = staminaFloatRandomJitter.y;
+        Vector2 jitter = new Vector2(
+            jx > 0f ? Random.Range(-jx, jx) : 0f,
+            jy > 0f ? Random.Range(-jy, jy) : 0f);
+
+        return radial + jitter;
     }
 
     void Update()
