@@ -19,7 +19,6 @@ public class EncounterObject : MonoBehaviour
 
     public void RefreshVisibility(TerritoryGrid grid)
     {
-        if (Collected || !_sr || grid == null) return;
         if (grid == null) return;
         bool inTerritory = grid.IsOwnedWorld(transform.position);
         var gm = GameManager.Instance;
