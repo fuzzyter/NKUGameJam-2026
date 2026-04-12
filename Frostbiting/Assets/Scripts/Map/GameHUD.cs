@@ -1,8 +1,7 @@
-
+using System.Collections;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-
 public class GameHUD : MonoBehaviour
 {
     public GameManager gameManager;
@@ -20,10 +19,92 @@ public class GameHUD : MonoBehaviour
     public Camera worldCamera;
     public Image[] hunterHearts;
 
+    [Header("Stamina pickup float")]
+    public TextMeshProUGUI staminaDeltaFloatTemplate;
+
+    public Color staminaGainColor = new Color(0.4f, 0.95f, 0.5f, 1f);
+    public Color staminaLossColor = new Color(1f, 0.4f, 0.4f, 1f);
+    public float staminaFloatDuration = 0.85f;
+    public float staminaFloatStartYOffset = -36f;
+    public float staminaFloatEndYOffset = 72f;
+
+    GameManager _pickupEventSubscribedTo;
+
+    void SubscribePickupDeltaIfNeeded()
+    {
+        var gm = gameManager ? gameManager : GameManager.Instance;
+        if (gm == null || _pickupEventSubscribedTo == gm) return;
+        if (_pickupEventSubscribedTo != null)
+            _pickupEventSubscribedTo.OnStaminaDeltaFromPickup -= OnStaminaDeltaFromPickup;
+        _pickupEventSubscribedTo = gm;
+        _pickupEventSubscribedTo.OnStaminaDeltaFromPickup += OnStaminaDeltaFromPickup;
+    }
+
+    void UnsubscribePickupDelta()
+    {
+        if (_pickupEventSubscribedTo == null) return;
+        _pickupEventSubscribedTo.OnStaminaDeltaFromPickup -= OnStaminaDeltaFromPickup;
+        _pickupEventSubscribedTo = null;
+    }
+
+    void OnEnable() => SubscribePickupDeltaIfNeeded();
+
+    void OnDisable() => UnsubscribePickupDelta();
+
+    void OnStaminaDeltaFromPickup(float delta)
+    {
+        if (!staminaDeltaFloatTemplate || Mathf.Approximately(delta, 0f)) return;
+        StartCoroutine(StaminaFloatRoutine(delta));
+    }
+
+    IEnumerator StaminaFloatRoutine(float delta)
+    {
+        RectTransform templateRt = staminaDeltaFloatTemplate.rectTransform;
+        Transform parent = templateRt.parent;
+        GameObject go = Instantiate(staminaDeltaFloatTemplate.gameObject, parent);
+        var rt = go.GetComponent<RectTransform>();
+        var tmp = go.GetComponent<TextMeshProUGUI>();
+        go.SetActive(true);
+        go.transform.SetAsLastSibling();
+
+        bool gain = delta > 0f;
+        int amount = Mathf.RoundToInt(Mathf.Abs(delta));
+        tmp.text = gain ? $"+{amount}" : $"-{amount}";
+        Color c = gain ? staminaGainColor : staminaLossColor;
+        tmp.color = c;
+
+        rt.anchorMin = templateRt.anchorMin;
+        rt.anchorMax = templateRt.anchorMax;
+        rt.pivot = templateRt.pivot;
+        rt.sizeDelta = templateRt.sizeDelta;
+        rt.localScale = Vector3.one;
+
+        Vector2 baseAnchored = templateRt.anchoredPosition;
+        Vector2 start = baseAnchored + new Vector2(0f, staminaFloatStartYOffset);
+        Vector2 end = baseAnchored + new Vector2(0f, staminaFloatEndYOffset);
+        rt.anchoredPosition = start;
+
+        float dur = Mathf.Max(0.05f, staminaFloatDuration);
+        float t = 0f;
+        while (t < dur)
+        {
+            t += Time.deltaTime;
+            float u = Mathf.Clamp01(t / dur);
+            float ease = 1f - (1f - u) * (1f - u);
+            rt.anchoredPosition = Vector2.LerpUnclamped(start, end, ease);
+            c.a = 1f - u;
+            tmp.color = c;
+            yield return null;
+        }
+
+        Destroy(go);
+    }
+
     void Update()
     {
         if (!gameManager)
             gameManager = GameManager.Instance;
+        SubscribePickupDeltaIfNeeded();
         if (!gameManager) return;
 
         if (runTimeText)

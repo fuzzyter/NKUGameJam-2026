@@ -40,6 +40,9 @@ public class GameManager : MonoBehaviour
 
     public bool RunEnded { get; private set; }
 
+    /// <summary>Good/Bad 획득 시 적용된 스태미나 변화량 (UI 피드백용).</summary>
+    public event System.Action<float> OnStaminaDeltaFromPickup;
+
     public float RunElapsedSeconds => RunEnded ? _frozenRunElapsed : Time.timeSinceLevelLoad;
 
     float _frozenRunElapsed;
@@ -136,9 +139,11 @@ public class GameManager : MonoBehaviour
                 break;
             case EncounterType.Good:
                 AddStamina(20f);
+                OnStaminaDeltaFromPickup?.Invoke(20f);
                 break;
             case EncounterType.Bad:
                 AddStamina(-15f);
+                OnStaminaDeltaFromPickup?.Invoke(-15f);
                 break;
             case EncounterType.Hunter:
                 hunterCount++;
