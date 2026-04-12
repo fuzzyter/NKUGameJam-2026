@@ -23,6 +23,7 @@ public class PlayerMapController : MonoBehaviour
         _isDrawing && territory != null && !territory.IsOwnedWorld(transform.position);
 
     readonly List<Vector2Int> _trail = new List<Vector2Int>();
+    SpriteRenderer _playerSprite;
     Vector2Int _lastTrailCell = new Vector2Int(int.MinValue, int.MinValue);
     Vector2 _lastWorldOutside;
     bool _wasInside;
@@ -42,6 +43,7 @@ public class PlayerMapController : MonoBehaviour
         trailLine.startColor = new Color(0.1f, 0.95f, 1f, 0.95f);
         trailLine.endColor = new Color(0.5f, 1f, 1f, 0.85f);
         AssignDefaultLineMaterial(trailLine);
+        _playerSprite = GetComponent<SpriteRenderer>();
     }
 
     static void AssignDefaultLineMaterial(LineRenderer lr)
@@ -181,6 +183,9 @@ public class PlayerMapController : MonoBehaviour
 
         if (input.sqrMagnitude > 0.0001f)
             LastFacingDirection = input.normalized;
+
+        if (_playerSprite && Mathf.Abs(input.x) > 0.01f)
+            _playerSprite.flipX = input.x < 0f;
 
         Vector2 p = transform.position;
         p += input * (moveSpeed * dt);

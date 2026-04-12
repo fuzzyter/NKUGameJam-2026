@@ -36,6 +36,7 @@ public class PlayerProximityCompanion : MonoBehaviour
     public float behindDistance = 0.28f;
 
     AudioSource _beepAudio;
+    SpriteRenderer _playerSpriteForFlip;
     Transform _spatialListener;
     Color _baseColor = Color.white;
     float _blinkPhase;
@@ -57,6 +58,8 @@ public class PlayerProximityCompanion : MonoBehaviour
 
         if (!player)
             player = GetComponentInParent<PlayerMapController>();
+        if (player)
+            _playerSpriteForFlip = player.GetComponent<SpriteRenderer>();
         if (!gameManager)
             gameManager = GameManager.Instance;
 
@@ -164,6 +167,9 @@ public class PlayerProximityCompanion : MonoBehaviour
         TerritoryGrid grid = TerritoryGrid.Instance;
         if (grid == null || !grid.IsReady)
             return;
+
+        if (spriteRenderer && _playerSpriteForFlip)
+            spriteRenderer.flipX = _playerSpriteForFlip.flipX;
 
         if (onlyWhileDrawingOutsideOwned && !player.IsDrawingOutsideOwned)
         {
