@@ -7,7 +7,7 @@ public class GameHUD : MonoBehaviour
     public GameManager gameManager;
     public Slider staminaSlider;
 
-    [Tooltip("e.g. 10/100 — current / max stamina. Leave empty to hide.")]
+    [Tooltip("current / max stamina")]
     public TextMeshProUGUI staminaNumericText;
 
     [Tooltip("Camera viewport inside Treasure + Hunter count (no distinction)")]
