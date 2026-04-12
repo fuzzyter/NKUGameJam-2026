@@ -1,9 +1,4 @@
-// Canvas 안 구성 예:
-// Canvas (항상 활성, Canvas Scaler 권장)
-//  └ Panel "AreaChoice" (처음 비활성) ← panel 로 연결 (이 스크립트는 Canvas에 붙이는 걸 권장)
-//      ├ Text
-//      ├ Button Yes → yesButton
-//      └ Button No  → noButton
+
 using System;
 using UnityEngine;
 using UnityEngine.UI;

@@ -11,6 +11,8 @@ public class EncounterObject : MonoBehaviour
     void Awake()
     {
         _sr = GetComponent<SpriteRenderer>();
+        if (!_sr)
+            _sr = GetComponentInChildren<SpriteRenderer>(true);
         if (_sr)
             _baseColor = _sr.color;
     }
@@ -18,16 +20,24 @@ public class EncounterObject : MonoBehaviour
     public void RefreshVisibility(TerritoryGrid grid)
     {
         if (Collected || !_sr || grid == null) return;
+        if (grid == null) return;
         bool inTerritory = grid.IsOwnedWorld(transform.position);
-        _sr.enabled = inTerritory;
-        if (inTerritory)
-            _sr.color = _baseColor;
+        var gm = GameManager.Instance;
+        int orderEnc = gm != null ? gm.orderInLayerEncounter : 20;
+        foreach (SpriteRenderer r in GetComponentsInChildren<SpriteRenderer>(true))
+        {
+            r.enabled = inTerritory;
+            if (inTerritory)
+            {
+                r.sortingOrder = orderEnc;
+                if (r == _sr)
+                    r.color = _baseColor;
+            }
+        }
     }
 
     public void MarkCollected()
     {
         Collected = true;
-        if (_sr)
-            _sr.enabled = false;
     }
 }

@@ -37,7 +37,7 @@ public class PlayerMapController : MonoBehaviour
             trailLine = GetComponent<LineRenderer>();
         trailLine.positionCount = 0;
         trailLine.useWorldSpace = true;
-        trailLine.sortingOrder = 30;
+        trailLine.sortingOrder = 35;
         trailLine.widthMultiplier = 0.12f;
         trailLine.startColor = new Color(0.1f, 0.95f, 1f, 0.95f);
         trailLine.endColor = new Color(0.5f, 1f, 1f, 0.85f);
@@ -72,6 +72,22 @@ public class PlayerMapController : MonoBehaviour
             mapBounds = gameManager.mapBounds;
 
         _wasInside = territory && territory.IsOwnedWorld(transform.position);
+        ApplySortingOrders();
+    }
+
+    void ApplySortingOrders()
+    {
+        var gm = gameManager ?? GameManager.Instance;
+        if (gm == null) return;
+        var psr = GetComponent<SpriteRenderer>();
+        if (psr)
+            psr.sortingOrder = gm.orderInLayerPlayerSprite;
+        if (trailLine)
+        {
+            if (psr)
+                trailLine.sortingLayerID = psr.sortingLayerID;
+            trailLine.sortingOrder = gm.orderInLayerPlayerTrail;
+        }
     }
 
     void Update()

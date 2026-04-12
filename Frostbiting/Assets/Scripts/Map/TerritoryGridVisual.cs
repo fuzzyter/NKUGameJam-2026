@@ -17,10 +17,22 @@ public class TerritoryGridVisual : MonoBehaviour
     void Awake()
     {
         _sr = GetComponent<SpriteRenderer>();
-        _sr.sortingOrder = 2;
         _sr.color = Color.white;
         EnsureSpriteMaterial(_sr);
         _grid = TerritoryGrid.Instance;
+        ApplySortingOrder();
+    }
+
+    void Start()
+    {
+        ApplySortingOrder();
+    }
+
+    void ApplySortingOrder()
+    {
+        if (_sr == null) return;
+        var gm = GameManager.Instance;
+        _sr.sortingOrder = gm != null ? gm.orderInLayerTerritory : 10;
     }
 
     static void EnsureSpriteMaterial(SpriteRenderer sr)
@@ -58,7 +70,6 @@ public class TerritoryGridVisual : MonoBehaviour
                 else
                 {
                     _tex.Apply(false, false);
-                    // 일부 환경에서 텍스처만 갱신하면 스프라이트 메시가 갱신되지 않음
                     RebuildSprite();
                 }
             }
@@ -120,6 +131,7 @@ public class TerritoryGridVisual : MonoBehaviour
         transform.SetPositionAndRotation(new Vector3(_grid.WorldMin.x, _grid.WorldMin.y, 0f), Quaternion.identity);
         transform.localScale = Vector3.one;
         EnsureSpriteMaterial(_sr);
+        ApplySortingOrder();
     }
 
     void DetachFromScaledParents()

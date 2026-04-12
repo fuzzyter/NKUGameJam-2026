@@ -1,33 +1,28 @@
 using UnityEngine;
 
-/// <summary>
-/// 플레이어 뒤를 따라다니는 스프라이트. 맵에 있는(수집 전) 에카운터와의 거리에 따라 깜빡임·효과음 간격이 빨라짐.
-/// </summary>
+
 public class PlayerProximityCompanion : MonoBehaviour
 {
-    [Header("Refs (비워도 부모/씬에서 찾음)")]
+    [Header("Refs")]
     public PlayerMapController player;
     public GameManager gameManager;
-    [Tooltip("비우면 같은 오브젝트 또는 자식에서 SpriteRenderer 검색")]
     public SpriteRenderer spriteRenderer;
 
-    [Header("감지")]
-    [Tooltip("이 거리 안에 수집 전 에카운터가 하나라도 있으면 반응")]
+    [Header("Detection")]
     public float warningRadius = 6f;
-    [Tooltip("켜면: 영역 밖에서 트레일을 그리는 동안에만 반응. 끄면 이동 중에도 근처 에카운터에 반응")]
     public bool onlyWhileDrawingOutsideOwned = false;
 
-    [Header("깜빡임")]
+    [Header("Blinking")]
     public float minBlinkSpeed = 2f;
     public float maxBlinkSpeed = 20f;
 
-    [Header("효과음")]
+    [Header("Sound")]
     public AudioClip proximityClip;
     public float minBeepInterval = 0.07f;
     public float maxBeepInterval = 0.45f;
     [Range(0.05f, 1f)] public float beepVolume = 0.55f;
 
-    [Header("플레이어 뒤 오프셋")]
+    [Header("Player behind offset")]
     public float behindDistance = 0.28f;
 
     AudioSource _audio;
@@ -77,7 +72,8 @@ public class PlayerProximityCompanion : MonoBehaviour
         var psr = player.GetComponent<SpriteRenderer>();
         if (psr)
             spriteRenderer.sortingLayerID = psr.sortingLayerID;
-        spriteRenderer.sortingOrder = psr ? psr.sortingOrder - 2 : 0;
+        var gm = gameManager ?? GameManager.Instance;
+        spriteRenderer.sortingOrder = gm != null ? gm.orderInLayerCompanion : 40;
     }
 
     void LateUpdate()
@@ -113,6 +109,7 @@ public class PlayerProximityCompanion : MonoBehaviour
 
         float urgency = 1f - Mathf.Clamp01(minD / warningRadius);
         spriteRenderer.enabled = true;
+        SortBehindPlayer();
         float speed = Mathf.Lerp(minBlinkSpeed, maxBlinkSpeed, urgency);
         _blinkPhase += Time.deltaTime * speed;
         float a = Mathf.Lerp(0.25f, 1f, (Mathf.Sin(_blinkPhase) * 0.5f + 0.5f) * urgency + (1f - urgency) * 0.35f);

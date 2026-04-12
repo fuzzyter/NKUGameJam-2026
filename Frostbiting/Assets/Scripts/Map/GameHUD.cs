@@ -1,8 +1,4 @@
-// Canvas 예시:
-//  - Slider → staminaSlider
-//  - TextMeshPro - Text (UI) → viewportTreasureHunterCountTMP (뷰에 보이는 Treasure+Hunter 개수)
-//  - Camera → worldCamera (비우면 Camera.main)
-//  - Image×3 → hunterHearts
+
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -12,7 +8,7 @@ public class GameHUD : MonoBehaviour
     public GameManager gameManager;
     public Slider staminaSlider;
 
-    [Tooltip("카메라 뷰포트 안에 보이는 Treasure + Hunter 개수 (구분 없이)")]
+    [Tooltip("Camera viewport inside Treasure + Hunter count (no distinction)")]
     public TextMeshProUGUI viewportTreasureHunterCountTMP;
 
     public Camera worldCamera;
