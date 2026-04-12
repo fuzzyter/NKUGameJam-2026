@@ -35,12 +35,12 @@ public class GameManager : MonoBehaviour
     public int maxHunter = 3;
 
     [Header("Scenes (add to Build Settings)")]
-    public string winSceneName = "EndWin";
-    public string loseSceneName = "EndLose";
+    public string winSceneName = "WinScene";
+    public string loseSceneName = "GameoverScene";
 
     public bool RunEnded { get; private set; }
 
-    /// <summary>Good/Bad 획득 시 적용된 스태미나 변화량 (UI 피드백용).</summary>
+    /// stamina pickup event
     public event System.Action<float> OnStaminaDeltaFromPickup;
 
     public float RunElapsedSeconds => RunEnded ? _frozenRunElapsed : Time.timeSinceLevelLoad;
