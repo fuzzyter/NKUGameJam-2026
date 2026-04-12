@@ -14,6 +14,9 @@ public class GameHUD : MonoBehaviour
     [Tooltip("run time (MM:SS)")]
     public TextMeshProUGUI runTimeText;
 
+    [Tooltip("collected treasures")]
+    public TextMeshProUGUI treasureCountText;
+
     public Camera worldCamera;
     public Image[] hunterHearts;
 
@@ -25,6 +28,9 @@ public class GameHUD : MonoBehaviour
 
         if (runTimeText)
             runTimeText.text = RunTimeFormat.AsMinutesSeconds(gameManager.RunElapsedSeconds);
+
+        if (treasureCountText)
+            treasureCountText.text = $"{gameManager.treasureCount}/{gameManager.maxTreasure}";
 
         if (staminaSlider)
         {
