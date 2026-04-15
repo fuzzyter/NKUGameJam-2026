@@ -65,11 +65,13 @@ public class AreaConfirmUI : MonoBehaviour
 
     void OnYesClicked()
     {
+        GameAudioManager.I?.PlayUiClick();
         _yes?.Invoke();
     }
 
     void OnNoClicked()
     {
+        GameAudioManager.I?.PlayUiClick();
         _no?.Invoke();
     }
 }

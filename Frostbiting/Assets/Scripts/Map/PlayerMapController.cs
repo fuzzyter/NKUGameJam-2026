@@ -23,6 +23,7 @@ public class PlayerMapController : MonoBehaviour
         _isDrawing && territory != null && !territory.IsOwnedWorld(transform.position);
 
     readonly List<Vector2Int> _trail = new List<Vector2Int>();
+    SpriteRenderer _playerSprite;
     Vector2Int _lastTrailCell = new Vector2Int(int.MinValue, int.MinValue);
     Vector2 _lastWorldOutside;
     bool _wasInside;
@@ -42,6 +43,7 @@ public class PlayerMapController : MonoBehaviour
         trailLine.startColor = new Color(0.1f, 0.95f, 1f, 0.95f);
         trailLine.endColor = new Color(0.5f, 1f, 1f, 0.85f);
         AssignDefaultLineMaterial(trailLine);
+        _playerSprite = GetComponent<SpriteRenderer>();
     }
 
     static void AssignDefaultLineMaterial(LineRenderer lr)
@@ -93,10 +95,14 @@ public class PlayerMapController : MonoBehaviour
     void Update()
     {
         if (!territory || !gameManager || gameManager.RunEnded)
+        {
+            GameAudioManager.I?.SetFootstepsActive(false);
             return;
+        }
 
         if (_waitingChoice)
         {
+            GameAudioManager.I?.SetFootstepsActive(false);
             Keyboard kb = Keyboard.current;
             bool yes = Input.GetKeyDown(KeyCode.Y) || (kb != null && kb.yKey.wasPressedThisFrame);
             bool no = Input.GetKeyDown(KeyCode.N) || Input.GetKeyDown(KeyCode.Escape) ||
@@ -109,6 +115,7 @@ public class PlayerMapController : MonoBehaviour
         }
 
         MoveAndClamp(Time.deltaTime);
+        GameAudioManager.I?.SetFootstepsActive(GetMoveInput().sqrMagnitude > 0.0001f);
 
         Vector2 pos = transform.position;
         bool inside = territory.IsOwnedWorld(pos);
@@ -120,6 +127,7 @@ public class PlayerMapController : MonoBehaviour
             _trailSnapshot.AddRange(_trail);
             _waitingChoice = true;
             _isDrawing = false;
+            GameAudioManager.I?.SetFootstepsActive(false);
             if (areaUi)
                 areaUi.Show(PendingYes, PendingNo);
             Debug.Log("Yes[Y] or No[N] or Escape[Esc]");
@@ -160,7 +168,7 @@ public class PlayerMapController : MonoBehaviour
         _wasInside = inside;
     }
 
-    void MoveAndClamp(float dt)
+    Vector2 GetMoveInput()
     {
         Vector2 input = Vector2.zero;
         Keyboard kb = Keyboard.current;
@@ -178,9 +186,18 @@ public class PlayerMapController : MonoBehaviour
         if (Input.GetKey(KeyCode.D)) input.x += 1f;
         if (input.sqrMagnitude > 1f)
             input.Normalize();
+        return input;
+    }
+
+    void MoveAndClamp(float dt)
+    {
+        Vector2 input = GetMoveInput();
 
         if (input.sqrMagnitude > 0.0001f)
             LastFacingDirection = input.normalized;
+
+        if (_playerSprite && Mathf.Abs(input.x) > 0.01f)
+            _playerSprite.flipX = input.x < 0f;
 
         Vector2 p = transform.position;
         p += input * (moveSpeed * dt);
